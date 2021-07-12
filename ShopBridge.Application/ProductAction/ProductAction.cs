@@ -12,76 +12,113 @@ namespace ShopBridge.Application.ProductAction
 
         public async Task<IEnumerable<Item>> Get()
         {
-            //returning all records of table tblMember.  
+            //returning all records of table items.  
             return db.Items.ToList().AsEnumerable();
         }
 
-        public int SaveItem(Item item)
+        public async Task<int> SaveItem(Item item)
         {
+            try
+            {
+                //validate incoming item
+                if (!validateItem(item))
+                {
+                    throw new Exception("Invalid item");
+                }
 
+                //To add an new item record  
+                db.Items.InsertOnSubmit(item);
 
-            //To add an new member record  
-            db.Items.InsertOnSubmit(item);
+                //Save the submitted record  
+                db.SubmitChanges();
 
-            //Save the submitted record  
-            db.SubmitChanges();
-
-            return item.ItemID;
-
+                return item.ItemID;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
 
         public async Task<Item> UpdateItem(Item item)
         {
-
-            if (!validateItem(item))
+            try
             {
-                throw new Exception("Invalid item");
-            }
-            //fetching and filter specific member id record   
-            var itemdetail = (from a in db.Items where a.ItemID == item.ItemID select a).FirstOrDefault();
+                //Validate incoming item
+                if (!validateItem(item))
+                {
+                    throw new Exception("Invalid item");
+                }
+                //fetching and filter specific item id record   
+                var itemdetail = (from a in db.Items where a.ItemID == item.ItemID select a).FirstOrDefault();
 
-            //checking fetched or not with the help of NULL or NOT.  
-            if (itemdetail != null)
+                //checking fetched or not with the help of NULL or NOT.  
+                if (itemdetail != null)
+                {
+                    //set received item object properties with itemdetail  
+                    itemdetail.ItemName = item.ItemName;
+                    itemdetail.Description = item.Description;
+                    itemdetail.price = item.price;
+                    //save set allocation.  
+                    db.SubmitChanges();
+                    return itemdetail;
+
+                }
+                else
+                {
+                    //return response error as Not Found  with exception message.  
+                    throw new Exception("Item not found" + item.ItemID.ToString());
+                }
+
+                return null;
+            }
+            catch (Exception e)
             {
-                //set received _member object properties with memberdetail  
-                itemdetail.ItemName = item.ItemName;
-                itemdetail.Description = item.Description;
-                itemdetail.price = item.price;
-                //save set allocation.  
-                db.SubmitChanges();
-                return itemdetail;
-
+                throw new Exception(e.Message);
             }
 
-            return null;
         }
 
-        public async void Delete(int itemId)
+        public async Task<int> Delete(int itemId)
         {
-            //fetching and filter specific member id record   
-            var _DeleteItem = (from a in db.Items where a.ItemID == itemId select a).FirstOrDefault();
-
-            //checking fetched or not with the help of NULL or NOT.  
-            if (_DeleteItem != null)
+            try
             {
+                //fetching and filter specific item id record   
+                var _DeleteItem = (from a in db.Items where a.ItemID == itemId select a).FirstOrDefault();
 
-                db.Items.DeleteOnSubmit(_DeleteItem);
-                db.SubmitChanges();
+                //checking fetched or not with the help of NULL or NOT.  
+                if (_DeleteItem != null)
+                {
 
-                //return response status as successfully deleted with member id  
+                    db.Items.DeleteOnSubmit(_DeleteItem);
+                    db.SubmitChanges();
+                    return itemId;
+                }
+                else
+                {
+                    //return response error as Not Found  with exception message.  
+                    throw new Exception("Item not found" + itemId.ToString());
+                }
+
+                return 0;
             }
-            else
+            catch (Exception e)
             {
-                //return response error as Not Found  with exception message.  
-                throw new Exception("Item not found" + itemId.ToString());
+                throw new Exception(e.Message);
             }
 
         }
 
         private bool validateItem(Item item)
         {
-            if (item.ItemName == null || item.price == null || item.Description == null)
+            //Validate null value 
+            if (item?.ItemName == null || item.price == null || item.Description == null)
                 return false;
+
+            //validate price
+            if (item.price <= 0)
+                return false;
+
             return true;
         }
     }

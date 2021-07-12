@@ -26,3 +26,11 @@ GO
   
 SET ANSI_PADDING OFF  
 GO  
+
+
+INSERT INTO  dbo.Items values
+('Laptop','Dell i7',65000.5),
+('Monitor','HP',45000.5),
+('Mouse','Dell',1500.75),
+('HeadPhones','JBL',15000.0),
+('Bluetooth speaker','Boat',1000.5)

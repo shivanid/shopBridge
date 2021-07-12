@@ -10,47 +10,42 @@ namespace ShopBridge.Web.Controllers
     public class ProductController : ApiController
     {
         private readonly IProductAction _productAction;
-        //Return Collection of Values  
-        // GET api/values
-        // 
+
+        // GET api/Product
         public ProductController(IProductAction productAction)
         {
             _productAction = productAction;
         }
         public async Task<IEnumerable<Item>> Get()
         {
-            //returning all records of table tblMember.  
+            //returning all records of table Item.  
             return await _productAction.Get();
         }
 
-
         //Receive the value and post it  
-        // POST api/values  
-        public IHttpActionResult Post([FromBody] Item item)
+        // POST api/Product  
+        public async Task<IHttpActionResult> Post([FromBody] Item item)
         {
             try
             {
-                var result = _productAction.SaveItem(item);
-                //return response status as successfully created with member entity  
-                //var msg = Request.CreateResponse(HttpStatusCode.Created, item);
-                //Response message with requesturi for check purpose  
-                // msg.Headers.Location = new Uri(Request.RequestUri + item.ItemID.ToString());
+                //Save new Item in Items table
+                var result = await _productAction.SaveItem(item);
                 return Ok(result);
             }
             catch (Exception ex)
             {
                 //return response as bad request  with exception message.  
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
 
         ////Receive the value and update it  
-        //// PUT api/values/5  
-        public IHttpActionResult Put(int id, [FromBody] Item item)
+        //// PUT api/Product/ 
+        public async Task<IHttpActionResult> Put([FromBody] Item item)
         {
 
-            var itemdetail = _productAction.UpdateItem(item);
-            //return response status as successfully updated with member entity  
+            var itemdetail = await _productAction.UpdateItem(item);
+            //return response status as successfully updated with item entity  
             if (itemdetail != null)
                 return Ok(itemdetail);
             else
@@ -58,22 +53,17 @@ namespace ShopBridge.Web.Controllers
                 //return response error as NOT FOUND  with message.  
                 return NotFound();
             }
-
-
-
         }
 
         ////Delete the value  
-        //// DELETE api/values/5  
-        public IHttpActionResult Delete(int itemId)
+        //// DELETE api/Product/5  
+        public async Task<IHttpActionResult> Delete(int itemId)
         {
             try
             {
-                _productAction.Delete(itemId);
-
-                //return response status as successfully deleted with member id  
+                await _productAction.Delete(itemId);
+                //return response status as successfully deleted with item id  
                 return Ok(itemId);
-
             }
 
             catch (Exception ex)

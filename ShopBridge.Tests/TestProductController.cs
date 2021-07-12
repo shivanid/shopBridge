@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using ShopBridge.Application.ProductAction;
 using ShopBridge.Model;
@@ -35,7 +36,7 @@ namespace ShopBridge.Tests
         {
             // Arrange
             Item item = new Item() { ItemID = 1, ItemName = "Laptop", Description = "Dell i7", price = 100000 };
-            _ProductActionMock.Setup(action => action.SaveItem(It.IsAny<Item>())).Returns(It.IsAny<int>());
+            _ProductActionMock.Setup(action => action.SaveItem(It.IsAny<Item>())).Returns(It.IsAny<Task<int>>());
             // Act
             controller.Post(item);
 
@@ -62,7 +63,7 @@ namespace ShopBridge.Tests
             Item item = new Item { ItemID = 1, ItemName = "Laptop", Description = "Dell i7", price = 120000 };
 
             // Act
-            controller.Put(item.ItemID, item);
+            controller.Put(item);
 
             // Assert
             _ProductActionMock.Verify(p => p.UpdateItem(item));

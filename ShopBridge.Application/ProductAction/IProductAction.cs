@@ -7,9 +7,9 @@ namespace ShopBridge.Application.ProductAction
     public interface IProductAction
     {
         Task<IEnumerable<Item>> Get();
-        int SaveItem(Item item);
+        Task<int> SaveItem(Item item);
         Task<Item> UpdateItem(Item item);
-        void Delete(int itemId);
+        Task<int> Delete(int itemId);
 
     }
 }
